@@ -84,4 +84,37 @@ router.post("/doLogin", function(req, res, next) {
   // console.log(reqPassword);
 });
 
+router.post("/doSignUp", function(req, res, next) {
+  var reqUsername = req.body.username;
+  var reqPassword = req.body.password;
+  if (reqUsername && reqPassword) {
+    try {
+      User.find({ username: reqUsername }, function(err, results) {
+        if (err) console.log(err);
+        else if (results.length != 0) {
+          if (results[0].username == reqUsername) {
+            res.status(401).json({ message: "already Signed Up!!" });
+          }
+        } else {
+          var userInfo = new User({
+            username: reqUsername,
+            password: reqPassword
+          });
+          userInfo.save(function(err) {
+            if (err) throw err;
+            else {
+              console.log("User saved successfully!");
+              res.status(201).json({ message: "Signed Up" });
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    res.status(501).json({ message: "enter username and password" });
+  }
+});
+
 module.exports = router;
